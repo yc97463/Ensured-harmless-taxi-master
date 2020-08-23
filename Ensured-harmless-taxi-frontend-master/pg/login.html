@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登入</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+  <div class="login-logo">
+    <a href="../indexp.html"><img width="36" height="36" src="../assets/imgs/car.png" class="brand-image img-circle elevation-3" style="opacity: .8;background:#FFF;border-radius:50%;padding:5px;">安心乘車</a>
+  </div>
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">請登入</p>
+
+      <form action="" method="post" id="form-login" name="form-login">
+        <div class="input-group mb-3">
+          <input type="text" name="InputAcc" id="InputAcc" class="form-control" placeholder="手機號碼">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-phone-alt"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" name="InputPw" id="InputPw" class="form-control" placeholder="密碼">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-8">
+            <div class="icheck-primary">
+              <input type="checkbox" id="remember">
+              <label for="remember">
+                記住登入資訊
+              </label>
+            </div>
+          </div>
+          <!-- /.col -->
+          <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block">登入</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+
+      <!-- <div class="social-auth-links text-center mb-3">
+        <p>- OR -</p>
+        <p class="mb-1">
+          <a href="forgot-password.html">忘記密碼</a>
+        </p>
+        <p class="mb-0">
+          <a href="register.html" class="text-center">註冊新帳號</a>
+        </p>
+      </div> -->
+
+    </div>
+    <!-- /.login-card-body -->
+  </div>
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery -->
+<script src="../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../dist/js/adminlte.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $('#form-login').submit(function () {
+      //91 92 給你 讀account and pwassword
+      //完成了！！！
+            var input_acc = $('#InputAcc').val();
+            var input_pw = $('#InputPw').val();
+            if (input_acc == "" || input_pw == "") {
+                $.alert({
+                    title: '錯誤',
+                    content: '帳號或密碼未輸入!!請再試一次',
+                    type: 'red',
+                    typeAnimated: true
+                });
+                return false;
+            }
+            var data = {
+                grant_type: 'password',
+                client_id: config.client_id,
+                client_secret: config.client_secret,
+                username: input_acc,
+                password: input_pw
+            };
+            var res = request('POST', '/oauth/token', data, false);
+            if (res.code == 200) {
+                if (res.data.hasOwnProperty('access_token')) {
+                    $.cookie('access_token', res.data.access_token, {expires: res.data.expires_in / 3600 / 24});
+                    var user = jwt_decode(res.data.access_token)['user'];
+                    setTimeout(function () {
+                      //118 是登入成功後的跳轉 對
+                        location.replace("./indexp.html")
+                    }, 1000);
+                    return false;
+                } else {
+                    //$('#modal-verify').modal('show');
+                    return false;
+                }
+            } else if (res.code == 401) {
+                if (res.data.error == 'Username or Password Error') {
+                    $.alert({
+                        title: '錯誤',
+                        content: '帳號或密碼錯誤!!請再試一次',
+                        type: 'red',
+                        typeAnimated: true
+                    });
+                } else if (res.data.error == 'invalid_client') {
+                    $.alert({
+                        title: '錯誤',
+                        content: 'Client Error!!請聯繫管理員',
+                        type: 'red',
+                        typeAnimated: true
+                    });
+                } else {
+                    $.alert({
+                        title: '錯誤',
+                        content: '系統發生錯誤!!請聯繫管理員',
+                        type: 'red',
+                        typeAnimated: true
+                    });
+                }
+                return false;
+            } else if (res.code == 403) {
+                $.alert({
+                    title: '錯誤',
+                    content: '登入失敗超過5次!!請稍後再試(10分鐘)',
+                    type: 'red',
+                    typeAnimated: true
+                });
+                return false;
+            }
+            return false;
+        });
+  })
+</script>
+<!-- Bootstrap 4 -->
+<script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../dist/js/adminlte.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    $('#form-login').submit(function () {
+      //91 92 給你 讀account and pwassword
+      //完成了！！！
+            var input_acc = $('#InputAcc').val();
+            var input_pw = $('#InputPw').val();
+            if (input_acc == "" || input_pw == "") {
+                $.alert({
+                    title: '錯誤',
+                    content: '帳號或密碼未輸入!!請再試一次',
+                    type: 'red',
+                    typeAnimated: true
+                });
+                return false;
+            }
+            var data = {
+                grant_type: 'password',
+                client_id: config.client_id,
+                client_secret: config.client_secret,
+                username: input_acc,
+                password: input_pw
+            };
+            var res = request('POST', '/oauth/token', data, false);
+            if (res.code == 200) {
+                if (res.data.hasOwnProperty('access_token')) {
+                    $.cookie('access_token', res.data.access_token, {expires: res.data.expires_in / 3600 / 24});
+                    var user = jwt_decode(res.data.access_token)['user'];
+                    setTimeout(function () {
+                      //118 是登入成功後的跳轉 對
+                        location.replace("./indexp.html")
+                    }, 1000);
+                    return false;
+                } else {
+                    //$('#modal-verify').modal('show');
+                    return false;
+                }
+            } else if (res.code == 401) {
+                if (res.data.error == 'Username or Password Error') {
+                    $.alert({
+                        title: '錯誤',
+                        content: '帳號或密碼錯誤!!請再試一次',
+                        type: 'red',
+                        typeAnimated: true
+                    });
+                } else if (res.data.error == 'invalid_client') {
+                    $.alert({
+                        title: '錯誤',
+                        content: 'Client Error!!請聯繫管理員',
+                        type: 'red',
+                        typeAnimated: true
+                    });
+                } else {
+                    $.alert({
+                        title: '錯誤',
+                        content: '系統發生錯誤!!請聯繫管理員',
+                        type: 'red',
+                        typeAnimated: true
+                    });
+                }
+                return false;
+            } else if (res.code == 403) {
+                $.alert({
+                    title: '錯誤',
+                    content: '登入失敗超過5次!!請稍後再試(10分鐘)',
+                    type: 'red',
+                    typeAnimated: true
+                });
+                return false;
+            }
+            return false;
+        });
+  })
+</script>
+
+</body>
+</html>
