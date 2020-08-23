@@ -1,5 +1,11 @@
 # 黑克松的啦
 
+##原始資料取用
+- 競賽筆記與API對接說明書：https://hackmd.io/@yc97463/2020hackathontwjr
+- 專案 Package：https://works.imych.one/hackathonjr/6th-Ensured-harmless-taxi-master.zip
+
+---
+
 ## Member
 
 - @yc97463 
